@@ -23,6 +23,7 @@ from homeassistant.const import (
     CONF_RESOURCE_TEMPLATE,
     CONF_TIMEOUT,
     CONF_UNIT_OF_MEASUREMENT,
+    CONF_UNIQUE_ID,
     CONF_USERNAME,
     CONF_VALUE_TEMPLATE,
     CONF_VERIFY_SSL,
@@ -71,6 +72,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_VERIFY_SSL, default=DEFAULT_VERIFY_SSL): cv.boolean,
         vol.Optional(CONF_FORCE_UPDATE, default=DEFAULT_FORCE_UPDATE): cv.boolean,
         vol.Optional(CONF_TIMEOUT, default=DEFAULT_TIMEOUT): cv.positive_int,
+        vol.Optional(CONF_UNIQUE_ID): cv.string,
     }
 )
 
@@ -100,6 +102,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     json_attrs_path = config.get(CONF_JSON_ATTRS_PATH)
     force_update = config.get(CONF_FORCE_UPDATE)
     timeout = config.get(CONF_TIMEOUT)
+    unique_id = config.get(CONF_UNIQUE_ID)
 
     if value_template is not None:
         value_template.hass = hass
@@ -139,6 +142,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
                 force_update,
                 resource_template,
                 json_attrs_path,
+                unique_id,
             )
         ],
     )
@@ -159,6 +163,7 @@ class RestSensor(Entity):
         force_update,
         resource_template,
         json_attrs_path,
+        unique_id,
     ):
         """Initialize the REST sensor."""
         self._hass = hass
@@ -173,11 +178,17 @@ class RestSensor(Entity):
         self._force_update = force_update
         self._resource_template = resource_template
         self._json_attrs_path = json_attrs_path
+        self._unique_id = unique_id
 
     @property
     def name(self):
         """Return the name of the sensor."""
         return self._name
+
+    @property
+    def unique_id(self):
+        """Return the unique id of this sensor."""
+        return self._unique_id
 
     @property
     def unit_of_measurement(self):

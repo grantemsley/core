@@ -20,6 +20,7 @@ from homeassistant.const import (
     CONF_RESOURCE,
     CONF_RESOURCE_TEMPLATE,
     CONF_TIMEOUT,
+    CONF_UNIQUE_ID,
     CONF_USERNAME,
     CONF_VALUE_TEMPLATE,
     CONF_VERIFY_SSL,
@@ -57,6 +58,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Optional(CONF_VERIFY_SSL, default=DEFAULT_VERIFY_SSL): cv.boolean,
         vol.Optional(CONF_FORCE_UPDATE, default=DEFAULT_FORCE_UPDATE): cv.boolean,
         vol.Optional(CONF_TIMEOUT, default=DEFAULT_TIMEOUT): cv.positive_int,
+        vol.Optional(CONF_UNIQUE_ID): cv.string,
     }
 )
 
@@ -84,6 +86,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     device_class = config.get(CONF_DEVICE_CLASS)
     value_template = config.get(CONF_VALUE_TEMPLATE)
     force_update = config.get(CONF_FORCE_UPDATE)
+    unique_id = config.get(CONF_UNIQUE_ID)
 
     if resource_template is not None:
         resource_template.hass = hass
@@ -118,6 +121,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
                 value_template,
                 force_update,
                 resource_template,
+                unique_id,
             )
         ],
     )
@@ -135,6 +139,7 @@ class RestBinarySensor(BinarySensorEntity):
         value_template,
         force_update,
         resource_template,
+        unique_id,
     ):
         """Initialize a REST binary sensor."""
         self._hass = hass
@@ -146,11 +151,17 @@ class RestBinarySensor(BinarySensorEntity):
         self._value_template = value_template
         self._force_update = force_update
         self._resource_template = resource_template
+        self._unique_id = unique_id
 
     @property
     def name(self):
         """Return the name of the binary sensor."""
         return self._name
+
+    @property
+    def unique_id(self):
+        """Return the unique id of this binary sensor."""
+        return self._unique_id
 
     @property
     def device_class(self):

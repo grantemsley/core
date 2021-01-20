@@ -19,6 +19,7 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_PARAMS,
     CONF_PASSWORD,
+    CONF_UNIQUE_ID
     CONF_RESOURCE,
     CONF_USERNAME,
     CONF_VERIFY_SSL,

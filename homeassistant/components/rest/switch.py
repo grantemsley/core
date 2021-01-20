@@ -15,6 +15,7 @@ from homeassistant.const import (
     CONF_PASSWORD,
     CONF_RESOURCE,
     CONF_TIMEOUT,
+    CONF_UNIQUE_ID,
     CONF_USERNAME,
     CONF_VERIFY_SSL,
     HTTP_BAD_REQUEST,
@@ -59,6 +60,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
         vol.Inclusive(CONF_USERNAME, "authentication"): cv.string,
         vol.Inclusive(CONF_PASSWORD, "authentication"): cv.string,
         vol.Optional(CONF_VERIFY_SSL, default=DEFAULT_VERIFY_SSL): cv.boolean,
+        vol.Optional(CONF_UNIQUE_ID): cv.string,
     }
 )
 
@@ -75,6 +77,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
     headers = config.get(CONF_HEADERS)
     params = config.get(CONF_PARAMS)
     name = config.get(CONF_NAME)
+    unique_id = config.get(CONF_UNIQUE_ID)
     username = config.get(CONF_USERNAME)
     password = config.get(CONF_PASSWORD)
     resource = config.get(CONF_RESOURCE)
@@ -107,6 +110,7 @@ async def async_setup_platform(hass, config, async_add_entities, discovery_info=
             is_on_template,
             timeout,
             verify_ssl,
+            unique_id,
         )
 
         req = await switch.get_device_state(hass)
@@ -140,6 +144,7 @@ class RestSwitch(SwitchEntity):
         is_on_template,
         timeout,
         verify_ssl,
+        unique_id,
     ):
         """Initialize the REST switch."""
         self._state = None
@@ -155,11 +160,17 @@ class RestSwitch(SwitchEntity):
         self._is_on_template = is_on_template
         self._timeout = timeout
         self._verify_ssl = verify_ssl
+        self._unique_id = unique_id
 
     @property
     def name(self):
         """Return the name of the switch."""
         return self._name
+
+    @property
+    def unique_id(self):
+        """Return the unique id of this switch."""
+        return self._unique_id
 
     @property
     def is_on(self):
